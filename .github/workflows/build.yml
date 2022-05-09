@@ -1,231 +1,79 @@
-name: Docker Image CI
-
+name: CI
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+  push:
+    branches: master
   schedule:
-    - cron: "0 18 * * FRI"
-    - cron: "0 18 * * WED"
+    - cron: "0 0 * * *"
+
+env:
+  REGISTRY: ghcr.io
+  TAG_TYPES: |
+    type=ref,event=branch
+    type=ref,event=schedule
+    type=sha,prefix=,format=long
 
 jobs:
-
   base:
-
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        image:
-          - tag: base
-            context: base
+    env:
+      IMAGE: base
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to hub.docker.io Container Registry
-        uses: docker/login-action@v1
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          username: mosquito
-          password: ${{ secrets.DH_TOKEN }}
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}
+          tags: ${{ env.TAG_TYPES }}
 
       - uses: docker/build-push-action@v2
         with:
-          context: ${{ matrix.image.context }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: ${{ github.ref == 'refs/heads/master' }}
-          pull: true
-          shm-size: 4G
-          tags: ghcr.io/snakepacker/python/${{ matrix.image.tag }},snakepacker/python:${{ matrix.image.tag }}
+          context: ${{ env.IMAGE }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-
-  images:
+  buildtime:
     needs: base
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        image:
-          - context: "all"
-            tag: "all"
-          - context: "python2.7"
-            tag: "2.7"
-          - context: "python3.6"
-            tag: "3.6"
-          - context: "python3.7"
-            tag: "3.7"
-          - context: "python3.8"
-            tag: "3.8"
-          - context: "python3.9"
-            tag: "3.9"
-          - context: "python3.10"
-            tag: "3.10"
+    env:
+      IMAGE: buildtime
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to hub.docker.io Container Registry
-        uses: docker/login-action@v1
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          username: mosquito
-          password: ${{ secrets.DH_TOKEN }}
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}
+          tags: ${{ env.TAG_TYPES }}
 
       - uses: docker/build-push-action@v2
         with:
-          context: ${{ matrix.image.context }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: ${{ github.ref == 'refs/heads/master' }}
-          pull: true
-          shm-size: 4G
-          tags: ghcr.io/snakepacker/python/${{ matrix.image.tag }},snakepacker/python:${{ matrix.image.tag }}
-
-
-  images-pillow:
-    needs: images
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        image:
-          - context: pillow/2.7
-            tag: 2.7-pillow
-          - context: pillow/3.6
-            tag: 3.6-pillow
-          - context: pillow/3.7
-            tag: 3.7-pillow
-          - context: pillow/3.8
-            tag: 3.8-pillow
-          - context: pillow/3.9
-            tag: 3.9-pillow
-          - context: pillow/3.10
-            tag: 3.10-pillow
-          - context: pillow/all
-            tag: all-pillow
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-
-      - name: Login to hub.docker.io Container Registry
-        uses: docker/login-action@v1
-        with:
-          username: mosquito
-          password: ${{ secrets.DH_TOKEN }}
-
-      - uses: docker/build-push-action@v2
-        with:
-          context: ${{ matrix.image.context }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: ${{ github.ref == 'refs/heads/master' }}
-          pull: true
-          shm-size: 4G
-          tags: ghcr.io/snakepacker/python/${{ matrix.image.tag }},snakepacker/python:${{ matrix.image.tag }}
-
-
-  apps:
-    needs:
-      - images
-      - images-pillow
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        image:
-          - context: ipython
-            tag: ipython
-          - context: pylama
-            tag: pylama
-          - context: pylava
-            tag: pylava
-          - context: certbot
-            tag: certbot
-          - context: black
-            tag: black
-          - context: gray
-            tag: gray
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-
-      - name: Login to hub.docker.io Container Registry
-        uses: docker/login-action@v1
-        with:
-          username: mosquito
-          password: ${{ secrets.DH_TOKEN }}
-
-      - uses: docker/build-push-action@v2
-        with:
-          context: ${{ matrix.image.context }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: ${{ github.ref == 'refs/heads/master' }}
-          pull: true
-          shm-size: 4G
-          tags: ghcr.io/snakepacker/python/${{ matrix.image.tag }},snakepacker/python:${{ matrix.image.tag }}
+          context: ${{ env.IMAGE }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BASE_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/base
+            BASE_TAG=${{ github.sha }}
