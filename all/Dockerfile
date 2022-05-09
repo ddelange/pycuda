@@ -1,4 +1,4 @@
-FROM ghcr.io/snakepacker/python/base
+FROM ghcr.io/ddelange/pycuda/base
 
 ENV PYTHONDONTWRITEBYTECODE=True
 

@@ -1,53 +1,17 @@
-A simple way to build a Python project
-======================================
+# pycuda
 
-![](https://github.com/snakepacker/python/raw/master/logo.png)
-
-This repository provides and demonstrates a way to pack python package into a
-compact Docker image, based on modern
-[Ubuntu Focal](https://releases.ubuntu.com/focal/) operation system.
-
-Available images
-----------------
-
-Docker Hub images
-
-Tag      | Info | Purpose | Features
- ------- | ---- | ------- | --------
-all      | ![](https://flat.badgen.net/docker/size/snakepacker/python/all/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/all/amd64?label=layers) | build stage | all available python versions, libpython headers and compiler
-all-pillow | ![](https://flat.badgen.net/docker/size/snakepacker/python/all-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/all-pillow/amd64?label=layers) | build stage |  all available python versions, libpython headers, graphics libraries headers and compiler
-[3.10](https://docs.python.org/3/whatsnew/3.10.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.10/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.10/amd64?label=layers) | target stage | pure python 3.10
-[3.9](https://docs.python.org/3/whatsnew/3.9.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.9/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.9/amd64?label=layers) | target stage | pure python 3.9
-[3.8](https://docs.python.org/3/whatsnew/3.8.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.8/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.8/amd64?label=layers) | target stage | pure python 3.8
-[3.7](https://docs.python.org/3/whatsnew/3.7.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.7/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.7/amd64?label=layers) | target stage | pure python 3.7
-[3.6](https://docs.python.org/3/whatsnew/3.6.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.6/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.6/amd64?label=layers) | target stage | pure python 3.6
-[2.7](https://docs.python.org/2/whatsnew/2.7.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/2.7/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/2.7/amd64?label=layers) | target stage | pure python 2.7
-[3.10-pillow](https://docs.python.org/3/whatsnew/3.10.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.10-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.10-pillow/amd64?label=layers) | target stage | pure python 3.10 with graphics libraries binaries
-[3.9-pillow](https://docs.python.org/3/whatsnew/3.9.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.9-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.9-pillow/amd64?label=layers) | target stage | pure python 3.9 with graphics libraries binaries
-[3.8-pillow](https://docs.python.org/3/whatsnew/3.8.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.8-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.8-pillow/amd64?label=layers) | target stage | pure python 3.8 with graphics libraries binaries
-[3.7-pillow](https://docs.python.org/3/whatsnew/3.7.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.7-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.7-pillow/amd64?label=layers) | target stage | pure python 3.7 with graphics libraries binaries
-[3.6-pillow](https://docs.python.org/3/whatsnew/3.6.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/3.6-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/3.6-pillow/amd64?label=layers) | target stage | pure python 3.6 with graphics libraries binaries
-[2.7-pillow](https://docs.python.org/2/whatsnew/2.7.html) | ![](https://flat.badgen.net/docker/size/snakepacker/python/2.7-pillow/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/2.7-pillow/amd64?label=layers) | target stage | pure python 3.3 with graphics libraries binaries
-[pylama](https://pylama.readthedocs.io/en/latest/) | ![](https://flat.badgen.net/docker/size/snakepacker/python/pylama/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/pylama/amd64?label=layers) | ready to use | pylama application image (useful for drone.ci)
-[pylava](https://pylavadocs.readthedocs.io/en/latest/) | ![](https://flat.badgen.net/docker/size/snakepacker/python/pylava/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/pylava/amd64?label=layers) | ready to use | pylava application image (useful for drone.ci)
-[ipython](https://jupyter.org) | ![](https://flat.badgen.net/docker/size/snakepacker/python/ipython/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/ipython/amd64?label=layers) | ready to use | ipython application image
-[certbot](https://certbot.eff.org) | ![](https://flat.badgen.net/docker/size/snakepacker/python/certbot/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/certbot/amd64?label=layers) | ready to use | certbot application image
-[black](https://black.readthedocs.io/en/stable/) | ![](https://flat.badgen.net/docker/size/snakepacker/python/black/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/black/amd64?label=layers) | ready to use | black application image (useful for drone.ci)
-[gray](https://github.com/dizballanze/gray) | ![](https://flat.badgen.net/docker/size/snakepacker/python/gray/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/gray/amd64?label=layers) | ready to use | gray application image (useful for drone.ci)
-base     | ![](https://flat.badgen.net/docker/size/snakepacker/python/base/amd64?label=size) ![](https://flat.badgen.net/docker/layers/snakepacker/python/base/amd64?label=layers) | |
+Build compact multi-stage CUDA images for Python based ML projects.
 
 
+## Concept
 
-Concept
--------
+The main idea of this method is to create a `virtualenv` for your package using a
+heavy full-powered image (which contains commonly 
+used headers, libraries, compilers, etc. which are only needed during build time), and then copy it into a
+base image with a Python version of choice.
+Any build artifacts that are unneeded for runtime won't be copied into the final image, further reducing image size.
 
-The main idea of this method is to build a `virtualenv` for your package using 
-heavy full-powered image (e.g. `snakepacker/python:all`, that contains all 
-necessary headers, libraries, compiler, etc.), and then copy it into thin 
-`base image` with suitable Python version.
-
-Reasons
--------
+## Reasoning
 
 Why so complex? You could just `COPY` directory with your python project into 
 Docker container, and for the first point of view this seems to be reasonable. 
@@ -65,7 +29,7 @@ But just copying directory with python project cause several problems:
 
 - No explicit entrypoint. It is not obvious what commands end user is able to 
   run (we hope you've implemented `-h` or `--help` arguments).
-  
+
 - By default, tox interprets your package as python module, e.g. it tries to 
   run `pip install .` when preparing environment.
 
@@ -76,8 +40,7 @@ and non-obvious for your users.
 So, we recommend to spend a little more time and pack your package carefully, 
 so your users would run it with pleasure.
 
-Example
--------
+## Usage
 
 For example, you may build the `jupyter notebook`. Just create a Dockerfile 
 with the following content:
@@ -90,7 +53,7 @@ with the following content:
 # 1. All the Python versions
 # 2. required python headers
 # 3. C compiler and developer tools
-FROM snakepacker/python:all as builder
+FROM ghcr.io/ddelange/pycuda:all as builder
 
 # Create virtualenv on python 3.7
 # Target folder should be the same on the build stage and on the target stage
@@ -106,7 +69,7 @@ RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
 ####################### TARGET STAGE ############################
 #################################################################
 # Use the image version used on the build stage
-FROM snakepacker/python:3.7
+FROM ghcr.io/ddelange/pycuda:3.7
 
 # Copy virtualenv to the target image
 COPY --from=builder /usr/share/python3/app /usr/share/python3/app
@@ -125,8 +88,7 @@ And just build this:
 docker build -t ipython .
 ```
 
-Useful tools
-------------
+## Useful tools
 
 All images contain ready to use and simple wrappers for easy image building.
 

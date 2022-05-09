@@ -6,7 +6,7 @@ ENV TZ Etc/UTC
 ENV LANG en_US.UTF-8
 
 COPY sources.list /etc/apt/sources.list
-COPY apt.conf /etc/apt/apt.conf.d/snakepacker
+COPY apt.conf /etc/apt/apt.conf.d/pycuda
 
 RUN apt-get update && \
 	apt-get upgrade -y && \
