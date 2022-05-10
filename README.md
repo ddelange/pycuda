@@ -42,7 +42,7 @@ so your users would run it with pleasure.
 
 ## Usage
 
-For example, you may build the `jupyter notebook`. Just create a Dockerfile 
+For example, you may build a jupyter notebook server with Tensorflow pre-installed. Just create a Dockerfile 
 with the following content:
 
 ```Dockerfile
@@ -50,42 +50,47 @@ with the following content:
 ####################### BUILD STAGE #############################
 #################################################################
 # This image contains:
-# 1. All the Python versions
-# 2. required python headers
+# 1. Multiple Python versions
+# 2. Required python headers
 # 3. C compiler and developer tools
-FROM ghcr.io/ddelange/pycuda:all as builder
+FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
-# Create virtualenv on python 3.7
+# Create virtualenv on python 3.9
 # Target folder should be the same on the build stage and on the target stage
-RUN python3.7 -m venv /usr/share/python3/app
+RUN python3.9 -m venv /usr/share/python3/app
 
-# Install target package
-RUN /usr/share/python3/app/bin/pip install -U pip 'ipython[notebook]'
+# For convenience, prepend the executables from the venv to PATH (python, pip, etc)
+ENV PATH="/usr/share/python3/app/bin:${PATH}"
 
-# Will be find required system libraries and their packages
+# Install some packages into the venv
+RUN pip install -U jupyterlab tensorflow
+
+# Record the required system libraries/packages
 RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
 
 #################################################################
 ####################### TARGET STAGE ############################
 #################################################################
 # Use the image version used on the build stage
-FROM ghcr.io/ddelange/pycuda:3.7
+FROM ghcr.io/ddelange/pycuda/runtime:3.9
 
-# Copy virtualenv to the target image
+# Copy over the venv
 COPY --from=builder /usr/share/python3/app /usr/share/python3/app
 
 # Install the required library packages
 RUN xargs -ra /usr/share/python3/app/pkgdeps.txt apt-install
 
-# Create a symlink to the target binary (just for convenience)
-RUN ln -snf /usr/share/python3/app/bin/ipython /usr/bin/
+# For convenience, prepend the executables from the venv to PATH (python, pip, etc)
+ENV PATH="/usr/share/python3/app/bin:${PATH}"
 
-CMD ["ipython"]
+# The packages in the venv are now ready to use
+ENV PORT=1337
+CMD ["jupyter", "lab", "--no-browser", "--port=${PORT}"]
 ```
 
 And just build this:
 ```bash
-docker build -t ipython .
+docker build -t jupyter .
 ```
 
 ## Useful tools

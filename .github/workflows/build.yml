@@ -8,12 +8,19 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  TAG_TYPES: |
-    type=ref,event=branch
-    type=ref,event=schedule
-    type=sha,prefix=,format=long
+  UBUNTU_IMAGE: nvidia/cuda
+  # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
+  UBUNTU_TAG: 11.3.1-cudnn8-runtime-ubuntu20.04  # 'focal' ubuntu version is hardcoded in base folder
 
 jobs:
+  autocancel:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: n1hility/cancel-previous-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   base:
     runs-on: ubuntu-latest
     env:
@@ -35,7 +42,9 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}
-          tags: ${{ env.TAG_TYPES }}
+          tags: |
+            type=ref,event=branch
+            type=sha,format=long,prefix=
 
       - uses: docker/build-push-action@v2
         with:
@@ -43,12 +52,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BASE_IMAGE=${{ env.UBUNTU_IMAGE }}
+            BASE_TAG=${{ env.UBUNTU_TAG }}
 
-  buildtime:
+  derivatives:
     needs: base
     runs-on: ubuntu-latest
-    env:
-      IMAGE: buildtime
+
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [runtime]
+        python_minor_version: [6, 7, 8, 9, 10]
+        include:
+          - image: buildtime
+            python_minor_version:
 
     steps:
       - uses: actions/checkout@v2
@@ -65,15 +84,18 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}
-          tags: ${{ env.TAG_TYPES }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}
+          tags: |
+            type=ref,event=branch,prefix=${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}
+            type=sha,format=long,prefix=${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}
 
       - uses: docker/build-push-action@v2
         with:
-          context: ${{ env.IMAGE }}
+          context: ${{ matrix.image }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASE_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/base
             BASE_TAG=${{ github.sha }}
+            PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
