@@ -72,7 +72,7 @@ RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
 ####################### TARGET STAGE ############################
 #################################################################
 # Use the image version used on the build stage
-FROM ghcr.io/ddelange/pycuda/runtime:3.9
+FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
 
 # Copy over the venv
 COPY --from=builder /usr/share/python3/app /usr/share/python3/app
