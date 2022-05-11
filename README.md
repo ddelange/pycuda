@@ -55,15 +55,16 @@ with the following content:
 # 3. C compiler and developer tools
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
-# Create virtualenv on python 3.9
-# Target folder should be the same on the build stage and on the target stage
-RUN python3.9 -m venv /usr/share/python3/app
-
 # For convenience, prepend the executables from the venv to PATH (python, pip, etc)
 ENV PATH="/usr/share/python3/app/bin:${PATH}"
 
+# Create virtualenv on e.g. python 3.9
+# Target folder should be the same on the build stage and on the target stage
+RUN python3.9 -m venv /usr/share/python3/app && \
+    pip install -U pip setuptools wheel
+
 # Install some packages into the venv
-RUN pip install -U jupyterlab tensorflow
+RUN pip install jupyterlab tensorflow
 
 # Record the required system libraries/packages
 RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
@@ -71,7 +72,7 @@ RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
 #################################################################
 ####################### TARGET STAGE ############################
 #################################################################
-# Use the image version used on the build stage
+# Use the same python version used on the build stage
 FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
 
 # Copy over the venv

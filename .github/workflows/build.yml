@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   UBUNTU_IMAGE: nvidia/cuda
   # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
-  UBUNTU_TAG: 11.6.2-cudnn8-runtime-ubuntu20.04  # 'focal' ubuntu version is hardcoded in base folder
+  UBUNTU_TAG: 11.6.2-cudnn8-runtime-ubuntu20.04
   PLATFORMS: linux/amd64,linux/arm64
 
 jobs:

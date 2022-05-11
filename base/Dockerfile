@@ -21,8 +21,10 @@ ENV TZ="Etc/UTC" \
 # needed for string substitution in RUN directives
 SHELL ["/bin/bash", "-c"]
 
-COPY sources.list /etc/apt/sources.list
 COPY apt.conf /etc/apt/apt.conf.d/pycuda
+COPY deadsnakes.list /etc/apt/sources.list.d/deadsnakes.list
+COPY deadsnakes.gpg /etc/apt/trusted.gpg.d/deadsnakes.gpg
+COPY tools/ /usr/local/sbin/
 
 RUN apt-get update && \
 	apt-get upgrade -y && \
@@ -31,9 +33,5 @@ RUN apt-get update && \
 	ln -snf /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
 	locale-gen en_US.UTF-8 && \
 	dpkg-reconfigure locales tzdata && \
-	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/*
-
-COPY deadsnakes.list /etc/apt/sources.list.d/deadsnakes.list
-COPY deadsnakes.gpg /etc/apt/trusted.gpg.d/deadsnakes.gpg
-COPY tools/ /usr/local/sbin/
-RUN chmod a+x /usr/local/sbin/* && rm -fr /var/log/* /tmp/*
+	chmod a+x /usr/local/sbin/* && \
+	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/* /tmp/*
