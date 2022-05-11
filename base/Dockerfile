@@ -21,17 +21,21 @@ ENV TZ="Etc/UTC" \
 # needed for string substitution in RUN directives
 SHELL ["/bin/bash", "-c"]
 
-COPY apt.conf /etc/apt/apt.conf.d/pycuda
-COPY deadsnakes.list /etc/apt/sources.list.d/deadsnakes.list
-COPY deadsnakes.gpg /etc/apt/trusted.gpg.d/deadsnakes.gpg
+COPY apt.conf /etc/apt/apt.conf.d/minimal
 COPY tools/ /usr/local/sbin/
 
 RUN apt-get update && \
 	apt-get upgrade -y && \
-	apt-get install -y --no-install-recommends gnupg2 openssl ca-certificates locales tzdata libffi7 apt-utils && \
+	apt-get install -y gnupg2 openssl ca-certificates locales tzdata libffi7 apt-utils software-properties-common && \
 	apt-get autoremove -y && \
+	# add https://github.com/deadsnakes
+	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F23C5A6CF475977595C89F51BA6932366A755776 && \
+	add-apt-repository ppa:deadsnakes/ppa && \
+	# configure locales
 	ln -snf /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
 	locale-gen en_US.UTF-8 && \
 	dpkg-reconfigure locales tzdata && \
+	# make tools executable
 	chmod a+x /usr/local/sbin/* && \
+	# cleanup
 	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/* /tmp/*
