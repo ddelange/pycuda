@@ -6,6 +6,7 @@ ARG PYTHON_MINOR_VERSION
 RUN python3.${PYTHON_MINOR_VERSION} -m venv /usr/share/python3/app
 
 ENV PATH="/usr/share/python3/app/bin:${PATH}" \
+    # ref https://pytorch.org/get-started/locally/#linux-pip
     PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu113"
 
 RUN pip install distributed jupyterlab tensorflow torch

@@ -10,7 +10,8 @@ env:
   REGISTRY: ghcr.io
   UBUNTU_IMAGE: nvidia/cuda
   # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
-  UBUNTU_TAG: 11.3.1-cudnn8-runtime-ubuntu20.04  # 'focal' ubuntu version is hardcoded in base folder
+  UBUNTU_TAG: 11.6.2-cudnn8-runtime-ubuntu20.04  # 'focal' ubuntu version is hardcoded in base folder
+  PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
   autocancel:
@@ -28,6 +29,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -49,6 +56,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ${{ env.IMAGE }}
+          platforms: ${{ env.PLATFORMS }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -72,6 +80,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -92,6 +106,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.image }}
+          platforms: ${{ env.PLATFORMS }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -113,6 +128,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -133,6 +154,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.image }}
+          platforms: linux/amd64 # ${{ env.PLATFORMS }} neither tf nor torch currently provide CUDA enabled aarch64 wheels
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -16,7 +16,7 @@ Any build artifacts that are unneeded for runtime won't be copied into the final
 Why so complex? You could just `COPY` directory with your python project into 
 Docker container, and for the first point of view this seems to be reasonable. 
 
-But just copying directory with python project cause several problems:
+But just copying a directory with a python project can cause several problems:
 
 - Generated on different operating system .pyc files can be put into Docker 
   image accidentally. Thus, python would try to rewrite .pyc with correct ones 
@@ -24,7 +24,7 @@ But just copying directory with python project cause several problems:
   in read-only mode - your application would break.  
    
 - Large possibility that you would also pack garbage files: pytest and tox 
-  cache, developer's virtualenv and other files, that just increate the size of 
+  cache, developer's virtualenv and other files, that just increase the size of 
   the resulting image.
 
 - No explicit entrypoint. It is not obvious what commands end user is able to 
@@ -34,7 +34,7 @@ But just copying directory with python project cause several problems:
   run `pip install .` when preparing environment.
 
 Yes, of course, you can solve all of those problems using hacks, specific
-settings, .dockeridnore file, and other tricks. But it would be non-intuitive 
+settings, .dockerignore file, and other tricks. But it would be non-intuitive 
 and non-obvious for your users.
 
 So, we recommend to spend a little more time and pack your package carefully, 
