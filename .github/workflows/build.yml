@@ -116,14 +116,14 @@ jobs:
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
 
   tf-torch:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'  # these images hardcode master tag
     needs: [base, derivatives]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        image: [tf-torch]
-        python_minor_version: [7, 8, 9, 10]
+        image: [tf-torch, vanilla]
+        python_minor_version: [6, 7, 8, 9, 10]
 
     steps:
       - uses: actions/checkout@v2

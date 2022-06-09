@@ -1,3 +1,4 @@
+# this Dockerfile demonstrates the creation of a venv with CUDA-enabled libraries
 ARG PYTHON_MINOR_VERSION
 
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder

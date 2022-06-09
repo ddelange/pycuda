@@ -1,3 +1,4 @@
+# this Dockerfile sets some defaults and prepares the toolchain
 ARG BASE_IMAGE
 ARG BASE_TAG
 FROM ${BASE_IMAGE}:${BASE_TAG}
