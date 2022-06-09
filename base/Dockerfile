@@ -22,7 +22,7 @@ ENV TZ="Etc/UTC" \
 # needed for string substitution in RUN directives
 SHELL ["/bin/bash", "-c"]
 
-COPY apt.conf /etc/apt/apt.conf.d/minimal
+COPY *.conf /etc/apt/apt.conf.d/
 COPY tools/ /usr/local/sbin/
 
 RUN apt-get update && \
