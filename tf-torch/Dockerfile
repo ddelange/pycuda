@@ -5,22 +5,27 @@ FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
 ARG PYTHON_MINOR_VERSION
 
-ENV PATH="/usr/share/python3/app/bin:${PATH}" \
-    # ref https://pytorch.org/get-started/locally/#linux-pip
-    PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu113"
+ENV VIRTUAL_ENV="/usr/share/python3/app"
 
-RUN python3.${PYTHON_MINOR_VERSION} -m venv /usr/share/python3/app && \
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+# ref https://pytorch.org/get-started/locally/#linux-pip
+ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu113"
+
+RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
 RUN pip install distributed jupyterlab tensorflow torch
 
-RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
+RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
 
 FROM ghcr.io/ddelange/pycuda/runtime:3.${PYTHON_MINOR_VERSION}-master
 
-ENV PATH="/usr/share/python3/app/bin:${PATH}"
+ENV VIRTUAL_ENV="/usr/share/python3/app"
 
-COPY --from=builder /usr/share/python3/app /usr/share/python3/app
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
-RUN xargs -ra /usr/share/python3/app/pkgdeps.txt apt-install
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install

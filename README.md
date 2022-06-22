@@ -55,19 +55,20 @@ with the following content:
 # 3. C compiler and developer tools
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
-# For convenience, prepend the executables from the venv to PATH (python, pip, etc)
-ENV PATH="/usr/share/python3/app/bin:${PATH}"
+# Activate the venv, Docker style
+ENV VIRTUAL_ENV="/usr/share/python3/app"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 # Create virtualenv on e.g. python 3.9
 # Target folder should be the same on the build stage and on the target stage
-RUN python3.9 -m venv /usr/share/python3/app && \
+RUN python3.9 -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
 # Install some packages into the venv
 RUN pip install jupyterlab tensorflow
 
 # Record the required system libraries/packages
-RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
+RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
 #################################################################
 ####################### TARGET STAGE ############################
@@ -75,14 +76,15 @@ RUN find-libdeps /usr/share/python3/app > /usr/share/python3/app/pkgdeps.txt
 # Use the same python version used on the build stage
 FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
 
-# Copy over the venv
-COPY --from=builder /usr/share/python3/app /usr/share/python3/app
+# Copy over the venv (ensure same path as venvs are not designed to be portable)
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # Install the required library packages
-RUN xargs -ra /usr/share/python3/app/pkgdeps.txt apt-install
+RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
 
-# For convenience, prepend the executables from the venv to PATH (python, pip, etc)
-ENV PATH="/usr/share/python3/app/bin:${PATH}"
+# Activate the venv, Docker style
+ENV VIRTUAL_ENV="/usr/share/python3/app"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 # The packages in the venv are now ready to use
 ENV PORT=1337
