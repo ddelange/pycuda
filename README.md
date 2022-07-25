@@ -79,12 +79,12 @@ FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
 # Copy over the venv (ensure same path as venvs are not designed to be portable)
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-# Install the required library packages
-RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
-
 # Activate the venv, Docker style
 ENV VIRTUAL_ENV="/usr/share/python3/app"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+# Install the required library packages
+RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
 
 # The packages in the venv are now ready to use
 ENV PORT=1337
