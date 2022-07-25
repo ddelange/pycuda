@@ -11,7 +11,7 @@ env:
   UBUNTU_IMAGE: nvidia/cuda
   # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
   UBUNTU_TAG: 11.6.2-cudnn8-runtime-ubuntu20.04
-  PLATFORMS: linux/amd64,linux/arm64
+  PLATFORMS: linux/amd64,linux/arm64/v8
 
 jobs:
   autocancel:
@@ -115,7 +115,7 @@ jobs:
             BASE_TAG=${{ github.sha }}
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
 
-  tf-torch:
+  examples:
     if: github.ref == 'refs/heads/master'  # these images hardcode master tag
     needs: [base, derivatives]
     runs-on: ubuntu-latest
@@ -154,7 +154,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.image }}
-          platforms: linux/amd64 # ${{ env.PLATFORMS }} neither tf nor torch currently provide CUDA enabled aarch64 wheels
+          platforms: ${{ matrix.image == 'tf-torch' && 'linux/amd64' || env.PLATFORMS }}  # neither tf nor torch currently provide CUDA enabled aarch64 wheels
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
