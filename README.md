@@ -76,12 +76,12 @@ RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 # Use the same python version used on the build stage
 FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
 
-# Copy over the venv (ensure same path as venvs are not designed to be portable)
-COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-
 # Activate the venv, Docker style
 ENV VIRTUAL_ENV="/usr/share/python3/app"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+# Copy over the venv (ensure same path as venvs are not designed to be portable)
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # Install the required library packages
 RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
@@ -108,7 +108,7 @@ Otherwise, you have to write something like this
 
 ```bash
 apt-get update && \
-apt-get install -y tcpdump && \
+apt-get install -y --no-upgrade --auto-remove tcpdump && \
 rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/*
 ```
 
@@ -116,6 +116,8 @@ It might be replaced like this:
 ```bash
 apt-install tcpdump
 ```
+
+The `--no-upgrade` flag avoids build failures when passing held packages (like cudnn8 installed and held in the cuda base image), e.g. originating from the `find-libdeps` command below.
 
 ### wait-for-port
 
