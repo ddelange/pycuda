@@ -10,7 +10,7 @@ ENV VIRTUAL_ENV="/usr/share/python3/app"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 # ref https://pytorch.org/get-started/locally/#linux-pip
-ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu113"
+ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu116"
 
 RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
