@@ -55,17 +55,14 @@ with the following content:
 # 3. C compiler and developer tools
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
-# Activate the venv, Docker style
-ENV VIRTUAL_ENV="/usr/share/python3/app"
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-
 # Create virtualenv on e.g. python 3.9
 # Target folder should be the same on the build stage and on the target stage
+# A VIRTUAL_ENV variable is set in the shared base image to make this easier
 RUN python3.9 -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
 # Install some packages into the venv
-RUN pip install jupyterlab tensorflow
+RUN pip install jupyterlab ipywidgets ipdb tensorflow
 
 # Record the required system libraries/packages
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
@@ -75,10 +72,6 @@ RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 #################################################################
 # Use the same python version used on the build stage
 FROM ghcr.io/ddelange/pycuda/runtime:3.9-master
-
-# Activate the venv, Docker style
-ENV VIRTUAL_ENV="/usr/share/python3/app"
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 
 # Copy over the venv (ensure same path as venvs are not designed to be portable)
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
@@ -95,6 +88,8 @@ And just build this:
 ```bash
 docker build -t jupyter .
 ```
+
+There are also pre-built jupyter images [available](https://github.com/ddelange/pycuda/pkgs/container/pycuda%2Fjupyter).
 
 ## Useful tools
 

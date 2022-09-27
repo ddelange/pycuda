@@ -42,3 +42,8 @@ RUN apt-get update && \
 	chmod a+x /usr/local/sbin/* && \
 	# cleanup
 	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/* /tmp/*
+
+# activate future venv, Docker style. ensure identical paths in build stage and final stage
+ENV VIRTUAL_ENV="/usr/share/python3/app"
+
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"

@@ -1,4 +1,4 @@
-# this Dockerfile demonstrates the creation of a venv with CUDA-enabled libraries
+# this Dockerfile demonstrates the creation of a venv with a jupyter server
 ARG PYTHON_MINOR_VERSION
 
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
@@ -8,10 +8,7 @@ ARG PYTHON_MINOR_VERSION
 RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
-# ref https://pytorch.org/get-started/locally/#linux-pip
-ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu116"
-
-RUN pip install jupyterlab ipywidgets ipdb tensorflow torch
+RUN pip install jupyterlab ipywidgets ipdb
 
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
