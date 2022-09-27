@@ -154,7 +154,6 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.image }}
-          platforms: ${{ matrix.image == 'tf-torch' && 'linux/amd64' || env.PLATFORMS }}  # neither tf nor torch currently provide CUDA enabled aarch64 wheels
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

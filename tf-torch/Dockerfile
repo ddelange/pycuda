@@ -15,7 +15,7 @@ ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu116"
 RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
-RUN pip install distributed jupyterlab tensorflow torch
+RUN pip install jupyterlab ipywidgets tensorflow torch
 
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
