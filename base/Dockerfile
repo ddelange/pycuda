@@ -30,7 +30,6 @@ RUN apt-get update && \
 	apt-get upgrade -y && \
 	apt-get install -y gnupg2 openssl ca-certificates locales tzdata libffi7 apt-utils software-properties-common && \
 	# add https://github.com/deadsnakes
-	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F23C5A6CF475977595C89F51BA6932366A755776 && \
 	add-apt-repository ppa:deadsnakes/ppa && \
 	# only needed to run the add-apt-repository python script
 	apt-get purge -y software-properties-common && \
