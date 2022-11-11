@@ -5,7 +5,8 @@ FROM ${BASE_IMAGE}:${BASE_TAG}
 
 ENV TZ="Etc/UTC" \
 	LANG="en_US.UTF-8" \
-	DEBIAN_FRONTEND="noninteractive" \
+	LANGUAGE="en_US.UTF-8" \
+	LC_ALL="en_US.UTF-8" \
 	LC_CTYPE="en_US.UTF-8" \
 	LC_NUMERIC="en_US.UTF-8" \
 	LC_TIME="en_US.UTF-8" \
@@ -18,6 +19,7 @@ ENV TZ="Etc/UTC" \
 	LC_TELEPHONE="en_US.UTF-8" \
 	LC_MEASUREMENT="en_US.UTF-8" \
 	LC_IDENTIFICATION="en_US.UTF-8" \
+	DEBIAN_FRONTEND="noninteractive" \
 	SHELL="/bin/bash"
 
 # needed for string substitution in RUN directives
