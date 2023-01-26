@@ -54,15 +54,20 @@ jobs:
             type=sha,format=long,prefix=
 
       - uses: docker/build-push-action@v2
+        env:
+          CACHE_TO_STRING: type=registry,mode=max,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:buildcache
         with:
           context: ${{ env.IMAGE }}
           platforms: ${{ env.PLATFORMS }}
-          push: true
+          pull: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASE_IMAGE=${{ env.UBUNTU_IMAGE }}
             BASE_TAG=${{ env.UBUNTU_TAG }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:buildcache
+          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
 
   derivatives:
     needs: base
@@ -104,16 +109,21 @@ jobs:
             type=sha,format=long,prefix=${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}
 
       - uses: docker/build-push-action@v2
+        env:
+          CACHE_TO_STRING: type=registry,mode=max,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}buildcache
         with:
           context: ${{ matrix.image }}
           platforms: ${{ env.PLATFORMS }}
-          push: true
+          pull: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BASE_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/base
             BASE_TAG=${{ github.sha }}
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}buildcache
+          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
 
   examples:
     if: github.ref == 'refs/heads/master'  # these images hardcode master tag
@@ -152,11 +162,16 @@ jobs:
             type=sha,format=long,prefix=${{ format('3.{0}-', matrix.python_minor_version) }}
 
       - uses: docker/build-push-action@v2
+        env:
+          CACHE_TO_STRING: type=registry,mode=max,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ format('3.{0}-', matrix.python_minor_version) }}buildcache
         with:
           context: ${{ matrix.image }}
           platforms: ${{ env.PLATFORMS }}
-          push: true
+          pull: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
+          cache-from: type=registry,ref=ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ format('3.{0}-', matrix.python_minor_version) }}buildcache
+          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
