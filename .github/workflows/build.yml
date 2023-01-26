@@ -67,7 +67,7 @@ jobs:
             BASE_IMAGE=${{ env.UBUNTU_IMAGE }}
             BASE_TAG=${{ env.UBUNTU_TAG }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE }}:buildcache
-          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
+          cache-to: ${{ github.event_name != 'pull_request' && env.CACHE_TO_STRING || '' }}
 
   derivatives:
     needs: base
@@ -123,10 +123,10 @@ jobs:
             BASE_TAG=${{ github.sha }}
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}buildcache
-          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
+          cache-to: ${{ github.event_name != 'pull_request' && env.CACHE_TO_STRING || '' }}
 
   examples:
-    if: github.ref == 'refs/heads/master'  # these images hardcode master tag
+    # if: github.ref == 'refs/heads/master'  # these images hardcode master tag
     needs: [base, derivatives]
     runs-on: ubuntu-latest
     strategy:
@@ -174,4 +174,4 @@ jobs:
           build-args: |
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
           cache-from: type=registry,ref=ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ format('3.{0}-', matrix.python_minor_version) }}buildcache
-          cache-to: ${{ github.event_name == 'push' && env.CACHE_TO_STRING || '' }}
+          cache-to: ${{ github.event_name != 'pull_request' && env.CACHE_TO_STRING || '' }}
