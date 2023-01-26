@@ -8,12 +8,9 @@ ARG PYTHON_MINOR_VERSION
 RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
-# get CUDA wheel on x86 and build from source on arm64 https://github.com/pytorch/pytorch/issues/13130
-RUN pip install torch --index-url https://download.pytorch.org/whl/cu117 --no-deps || \
-    ( git clone --recursive https://github.com/pytorch/pytorch && pip install ./pytorch --no-deps )
-
-# get the deps for torch now that it is installed
-RUN pip install torch
+# get CUDA wheel on x86, build from source on arm64 ref https://github.com/pytorch/pytorch/issues/13130
+RUN pip install torch-1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 || \
+    ( git clone --recurse-submodules --shallow-submodules --depth 1 --branch v1.13.1 https://github.com/pytorch/pytorch && pip install -vv ./pytorch )
 
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 

@@ -20,7 +20,7 @@ ENV TZ="Etc/UTC" \
 	LC_MEASUREMENT="en_US.UTF-8" \
 	LC_IDENTIFICATION="en_US.UTF-8" \
 	DEBIAN_FRONTEND="noninteractive" \
-	SHELL="/bin/bash"
+	PIP_NO_CACHE_DIR=1
 
 # needed for string substitution in RUN directives
 SHELL ["/bin/bash", "-c"]
@@ -44,7 +44,6 @@ RUN apt-get update && \
 	# cleanup
 	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/* /tmp/*
 
-# activate future venv, Docker style. ensure identical paths in build stage and final stage
+# pre-activate venv, Docker style. ensure identical venv path in build stage and final stage, as venvs are not designed to be portable
 ENV VIRTUAL_ENV="/usr/share/python3/app"
-
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
