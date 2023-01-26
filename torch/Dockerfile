@@ -10,7 +10,7 @@ RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
 
 # get CUDA wheel on x86, build from source on arm64 ref https://github.com/pytorch/pytorch/issues/13130
 RUN pip install torch-1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 || \
-    ( git clone --recurse-submodules --shallow-submodules --depth 1 --branch v1.13.1 https://github.com/pytorch/pytorch && pip install -vv ./pytorch )
+    ( git clone --recurse-submodules --shallow-submodules --depth 1 --branch v1.13.1 https://github.com/pytorch/pytorch && BUILD_TEST=0 pip install -vv ./pytorch )
 
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
