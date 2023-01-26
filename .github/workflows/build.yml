@@ -132,7 +132,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [jupyter, tf-torch, vanilla]
+        image: [jupyter, torch, vanilla]
         python_minor_version: [7, 8, 9, 10, 11]  # there are no cp36 aarch64 wheels for tensorflow
 
     steps:
