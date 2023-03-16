@@ -42,7 +42,7 @@ so your users would run it with pleasure.
 
 ## Usage
 
-For example, you may build a jupyter notebook server with Tensorflow pre-installed. Just create a Dockerfile 
+For example, you may build a jupyter notebook server with PyTorch pre-installed. Just create a Dockerfile 
 with the following content:
 
 ```Dockerfile
@@ -50,9 +50,9 @@ with the following content:
 ####################### BUILD STAGE #############################
 #################################################################
 # This image contains:
-# 1. Multiple Python versions
-# 2. Required python headers
-# 3. C compiler and developer tools
+# 1. Multiple Python versions (3.6 and newer)
+# 2. Required Python headers
+# 3. C compiler and other helpful libraries commonly used for building wheels
 FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 
 # Create virtualenv on e.g. python 3.9
@@ -61,8 +61,11 @@ FROM ghcr.io/ddelange/pycuda/buildtime:master as builder
 RUN python3.9 -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
+# install torch CUDA build ref https://pytorch.org/get-started/locally/
+ENV PIP_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cu118"
+
 # Install some packages into the venv
-RUN pip install jupyterlab ipywidgets ipdb tensorflow
+RUN pip install jupyterlab ipywidgets ipdb torch torchaudio torchvision
 
 # Record the required system libraries/packages
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
@@ -80,6 +83,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
 
 # The packages in the venv are now ready to use
+EXPOSE 1337/tcp
 ENV PORT=1337
 CMD ["jupyter", "lab", "--no-browser", "--port=${PORT}"]
 ```

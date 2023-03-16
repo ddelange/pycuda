@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   UBUNTU_IMAGE: nvidia/cuda
   # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
-  UBUNTU_TAG: 11.7.1-cudnn8-runtime-ubuntu20.04
+  UBUNTU_TAG: 11.8.0-cudnn8-runtime-ubuntu20.04
   PLATFORMS: linux/amd64,linux/arm64/v8
 
 jobs:
@@ -77,7 +77,7 @@ jobs:
       fail-fast: false
       matrix:
         image: [runtime]
-        python_minor_version: [6, 7, 8, 9, 10, 11]
+        python_minor_version: [6, 7, 8, 9, 10, 11, 12]
         include:
           - image: buildtime
             python_minor_version:
@@ -132,8 +132,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [jupyter, tf-torch, vanilla]
-        python_minor_version: [7, 8, 9, 10, 11]  # there are no cp36 aarch64 wheels for tensorflow
+        image: [jupyter, vanilla]
+        python_minor_version: [6, 7, 8, 9, 10, 11, 12]
 
     steps:
       - uses: actions/checkout@v2

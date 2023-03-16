@@ -12,6 +12,7 @@ RUN apt-install \
 		python3.9 python3.9-dev python3.9-venv \
 		python3.10 python3.10-dev python3.10-venv python3.10-distutils \
 		python3.11 python3.11-dev python3.11-venv python3.11-distutils \
+		python3.12 python3.12-dev python3.12-venv python3.12-distutils \
 		# useful headers etc
 		cargo \
 		rustc \
