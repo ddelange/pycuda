@@ -142,4 +142,3 @@ Install saved packages
 ```bash
 xargs -ra /usr/share/python3/app/pkgdeps.txt apt-install
 ```
-
