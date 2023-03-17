@@ -20,6 +20,7 @@ ENV TZ="Etc/UTC" \
 	LC_MEASUREMENT="en_US.UTF-8" \
 	LC_IDENTIFICATION="en_US.UTF-8" \
 	DEBIAN_FRONTEND="noninteractive" \
+	SHELL="bash" \
 	PIP_NO_CACHE_DIR=1
 
 # needed for string substitution in RUN directives
@@ -41,6 +42,8 @@ RUN apt-get update && \
 	dpkg-reconfigure locales tzdata && \
 	# make tools executable
 	chmod a+x /usr/local/sbin/* && \
+	# https://github.com/pytorch/vision/issues/7423#issuecomment-1473268289
+	ln -nsf "$(ldconfig -p | grep libnvrtc.so | grep -o '/.*')" "$(ldconfig -p | grep libnvrtc.so | grep -o '/.*' | xargs dirname)/libnvrtc.so" \
 	# cleanup
 	rm -fr /var/lib/apt/lists /var/lib/cache/* /var/log/* /tmp/*
 
