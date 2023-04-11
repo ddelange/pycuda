@@ -23,4 +23,5 @@ RUN apt-install \
 		libxslt1-dev \
 		libyaml-dev \
 		git-core \
-		build-essential
+		build-essential \
+		pkg-config
