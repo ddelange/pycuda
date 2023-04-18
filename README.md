@@ -84,8 +84,7 @@ RUN xargs -ra ${VIRTUAL_ENV}/pkgdeps.txt apt-install
 
 # The packages in the venv are now ready to use
 EXPOSE 1337/tcp
-ENV PORT=1337
-CMD ["jupyter", "lab", "--no-browser", "--port=${PORT}"]
+CMD ["jupyter", "lab", "--no-browser", "--port", "1337"]
 ```
 
 And just build this:
