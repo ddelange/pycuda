@@ -134,6 +134,10 @@ jobs:
       matrix:
         image: [jupyter, vanilla]
         python_minor_version: [7, 8, 9, 10, 11, 12]
+        exclude:
+          # pyzmq currently missing cp312 wheels https://pypi.org/project/pyzmq/25.0.2/#files
+          - image: jupyter
+            python_minor_version: 12
 
     steps:
       - uses: actions/checkout@v2
