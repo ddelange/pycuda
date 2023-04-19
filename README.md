@@ -22,23 +22,20 @@ But just copying a directory with a python project can cause several problems:
   image accidentally. Thus, python would try to rewrite .pyc with correct ones 
   each time when Docker image would be started. If you would run Docker image 
   in read-only mode - your application would break.  
-   
+
 - Large possibility that you would also pack garbage files: pytest and tox 
   cache, developer's virtualenv and other files, that just increase the size of 
   the resulting image.
 
-- No explicit entrypoint. It is not obvious what commands end user is able to 
-  run (we hope you've implemented `-h` or `--help` arguments).
+The multi-stage virtualenv approach has several advantages:
 
-- By default, tox interprets your package as python module, e.g. it tries to 
-  run `pip install .` when preparing environment.
+- Only the libraries necessary for runtime will be present in the final image,
+  reducing the final image size by potentially hundreds of MBs.
 
-Yes, of course, you can solve all of those problems using hacks, specific
-settings, .dockerignore file, and other tricks. But it would be non-intuitive 
-and non-obvious for your users.
+- No unnecessary build artifacts and temporary files from the pip install will be
+  present in the final image, only the resulting virtualenv is copied.
 
-So, we recommend to spend a little more time and pack your package carefully, 
-so your users would run it with pleasure.
+- No need for `python3-dev` in the final stage, the virtualenv can run on `python3-minimal`.
 
 ## Usage
 
