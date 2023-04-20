@@ -20,7 +20,7 @@ ENV TZ="Etc/UTC" \
 	LC_MEASUREMENT="en_US.UTF-8" \
 	LC_IDENTIFICATION="en_US.UTF-8" \
 	DEBIAN_FRONTEND="noninteractive" \
-	SHELL="bash" \
+	SHELL="/bin/bash" \
 	PIP_NO_CACHE_DIR=1
 
 # needed for string substitution in RUN directives
