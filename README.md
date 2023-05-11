@@ -37,7 +37,23 @@ The multi-stage virtualenv approach has several advantages:
 
 - No need for `python3-dev` in the final stage, the virtualenv can run on `python3-minimal`.
 
+## Improvements
+
+This repository contains several improvements and simplifications over upstream:
+
+- Push tags for each commit SHA, in addition to the `master` tags. This allows users to 'freeze' their base image for versioning and/or docker registry caching reasons.
+- Do not overwrite the apt `sources.list` that ships with the official base image. This reduces attack surface and avoids redundant API calls during an `apt-get update`.
+- Set the `VIRTUAL_ENV` environment variable in the base image and prepends it to the `PATH` environment variable. These two actions mimic the essence of `source venv/bin/activate` in a way that persists across layers/images. An added convenience of having it in the base image is that the `VIRTUAL_ENV` variable can be re-used to save layers and increase readability. See also the example Dockerfile below.
+- Remove project-specific bloat like `tox` from the buildtime image: it's now reduced to a single `RUN` statement and the only 'sugar' left are some packages that are commonly needed to build python packages from source.
+- Reduce the base image to a single `RUN` statement with minimal footprint, removing bloat like `software-properties-common` within the same layer once it's no longer needed.
+- Switch to the recommended way of adding an apt repo (`add-apt-repository ppa:deadsnakes/ppa`) for a future-proof and secure setup of the different python versions.
+- Rewrite the continuous delivery workflow completely to simplify and generalize: increase readability, reduce code duplication, add docker layer caching for fewer CI minutes (but with a `--pull` in case of upstream security patches), re-use environment variables to generate the python minor version variants using build arguments instead of having separate Dockerfiles.
+
 ## Usage
+
+Github Actions pushes images to the Github Container Registry on every commit to `master`, and re-builds the latest commit every week in case of upstream security patches.
+
+These tags can either be used as-is, or this repository can be forked (don't forget to enable the CI workflow in the Actions tab) to build and push autonomously.
 
 For example, you may build a jupyter notebook server with PyTorch pre-installed. Just create a Dockerfile 
 with the following content:
