@@ -119,16 +119,17 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # run PRs with BASE_TAG master because base won't be pushed
           build-args: |
             BASE_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/base
-            BASE_TAG=${{ github.sha }}
+            BASE_TAG=${{ github.event_name != 'pull_request' && github.sha || 'master' }}
             PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}buildcache
           cache-to: ${{ github.event_name != 'pull_request' && env.CACHE_TO_STRING || '' }}
           provenance: false
 
   examples:
-    if: github.ref == 'refs/heads/master'  # these images hardcode master tag
+    # these images hardcode master tag
     needs: [base, derivatives]
     runs-on: ubuntu-latest
     strategy:
