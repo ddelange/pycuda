@@ -8,7 +8,7 @@ ARG PYTHON_MINOR_VERSION
 RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
     pip install -U pip setuptools wheel
 
-RUN pip install jupyterlab ipywidgets ipdb
+RUN pip install jupyterlab jupyter_collaboration ipywidgets ipdb
 
 RUN find-libdeps ${VIRTUAL_ENV} > ${VIRTUAL_ENV}/pkgdeps.txt
 
