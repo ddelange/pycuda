@@ -21,7 +21,8 @@ ENV TZ="Etc/UTC" \
 	LC_IDENTIFICATION="en_US.UTF-8" \
 	DEBIAN_FRONTEND="noninteractive" \
 	SHELL="/bin/bash" \
-	PIP_NO_CACHE_DIR=1
+	PIP_NO_CACHE_DIR=1 \
+ 	PYTHONUNBUFFERED=1
 
 # needed for string substitution in RUN directives
 SHELL ["/bin/bash", "-c"]
