@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
   UBUNTU_IMAGE: nvidia/cuda
   # CUDA compatibility ref https://docs.nvidia.com/deploy/cuda-compatibility/index.html
-  UBUNTU_TAG: 11.8.0-cudnn8-runtime-ubuntu20.04
+  UBUNTU_TAG: 11.8.0-cudnn8-runtime-ubuntu22.04
   PLATFORMS: linux/amd64,linux/arm64/v8
 
 jobs:
@@ -78,7 +78,7 @@ jobs:
       fail-fast: false
       matrix:
         image: [runtime]
-        python_minor_version: [7, 8, 9, 10, 11, 12]
+        python_minor_version: [7, 8, 9, 10, 11, 12, 13]
         include:
           - image: buildtime
             python_minor_version:
@@ -136,11 +136,11 @@ jobs:
       fail-fast: false
       matrix:
         image: [jupyter, vanilla]
-        python_minor_version: [7, 8, 9, 10, 11, 12]
+        python_minor_version: [7, 8, 9, 10, 11, 12, 13]
         exclude:
-          # pyzmq currently missing cp312 wheels https://pypi.org/project/pyzmq/25.0.2/#files
+          # pyzmq currently missing cp313 wheels https://pypi.org/project/pyzmq/25.1.2/#files
           - image: jupyter
-            python_minor_version: 12
+            python_minor_version: 13
 
     steps:
       - uses: actions/checkout@v3
