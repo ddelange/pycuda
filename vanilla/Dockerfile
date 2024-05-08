@@ -12,3 +12,5 @@ RUN python3.${PYTHON_MINOR_VERSION} -m venv ${VIRTUAL_ENV} && \
 FROM ghcr.io/ddelange/pycuda/runtime:3.${PYTHON_MINOR_VERSION}-master
 
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+RUN python -c "print('hello world')" && pip install ipdb
