@@ -120,11 +120,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # run PRs with BASE_TAG master because base won't be pushed
-          # on python_minor_version < 12, apt-install python3.x-distutils (used to be part of stdlib) instead of apt-install python3.x
           build-args: |
             BASE_IMAGE=${{ env.REGISTRY }}/${{ github.repository }}/base
             BASE_TAG=${{ github.event_name != 'pull_request' && github.sha || 'master' }}
-            PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}${{ (matrix.python_minor_version < 12 && '-distutils') || '' }}
+            PYTHON_MINOR_VERSION=${{ matrix.python_minor_version }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.image }}:${{ (startsWith(matrix.image, 'runtime') && format('3.{0}-', matrix.python_minor_version)) || '' }}buildcache
           cache-to: ${{ github.event_name != 'pull_request' && env.CACHE_TO_STRING || '' }}
           provenance: false
