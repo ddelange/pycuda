@@ -7,4 +7,5 @@ ARG PYTHON_MINOR_VERSION
 ARG PYTHON_DISTUTILS
 RUN apt-install \
         python3.${PYTHON_MINOR_VERSION}${PYTHON_DISTUTILS} \
+        python3.${PYTHON_MINOR_VERSION}-minimal \
         libpython3.${PYTHON_MINOR_VERSION}-stdlib
